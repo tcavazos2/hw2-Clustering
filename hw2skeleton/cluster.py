@@ -1,4 +1,8 @@
 from .utils import Atom, Residue, ActiveSite
+import numpy as np
+from .helpers import *
+from Bio import pairwise2
+import rmsd
 
 def compute_similarity(site_a, site_b):
     """
@@ -7,13 +11,29 @@ def compute_similarity(site_a, site_b):
     Input: two ActiveSite instances
     Output: the similarity between them (a floating point number)
     """
-
     similarity = 0.0
-
-    # Fill in your code here!
+    # Get strings of single letter aa residues
+    s_a = output_aa_string(site_a.residues)
+    s_b = output_aa_string(site_b.residues)
+    # Align strings
+    alignments = pairwise2.align.localxx(s_a, s_b)
+    align_a, align_b, s = alignments[0][:3]
+        
+    # Output indices where nucleotides in alignment match
+    inds_a, inds_b = match(align_a, align_b)
+    
+    if len(inds_a) > 2:
+        # Create matrix of coordinates for atom CA
+        V = create_coord_matrix(site_a, inds_a)
+        W = create_coord_matrix(site_b, inds_b)
+     
+        # Center and rotate Ca matrices then calculate RMSD
+        V -= rmsd.centroid(V)
+        W -= rmsd.centroid(W)
+        similarity = rmsd.kabsch_rmsd(V,W)
+    else: similarity = float("inf")
 
     return similarity
-
 
 def cluster_by_partitioning(active_sites):
     """
