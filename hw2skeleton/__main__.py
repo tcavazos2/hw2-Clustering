@@ -12,8 +12,8 @@ active_sites = read_active_sites(sys.argv[2])
 # Choose clustering algorithm
 if sys.argv[1][0:2] == '-P':
     print("Clustering using Partitioning method")
-    clustering = cluster_by_partitioning(active_sites)
-    write_clustering(sys.argv[3], clustering)
+    clustering = cluster_by_partitioning(active_sites, 4)
+    write_clustering(sys.argv[3]+"_"+str(k)+".txt", clustering)
 
 if sys.argv[1][0:2] == '-H':
     print("Clustering using hierarchical method")
