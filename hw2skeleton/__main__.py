@@ -26,7 +26,7 @@ if sys.argv[1][0:2] == '-P':
 if sys.argv[1][0:2] == '-H':
     sil_score_out = open("sil_scores_H.txt", "w")
     print("Clustering using hierarchical method")
-    clusterings = cluster_hierarchically(active_sites)
+    clusterings = cluster_hierarchically(active_sites, 1)
     write_mult_clusterings(sys.argv[3], clusterings)
 
     for i in range(0, len(clusterings)):
@@ -34,4 +34,15 @@ if sys.argv[1][0:2] == '-H':
         ind = len(clusterings)-i
         sil_score_out.write(str(ind)+"\t"+str(score)+"\n")
     sil_score_out.close()
+
+if sys.argv[1][0:8] == '-compare':
+    k = 17
+    print("Calculating similarity between clusters with k = ", k)
+    print("Clustering using partitioning method")
+    cluster_P = cluster_by_partitioning(active_sites, k)
+    print("Clustering using hierarchical method")
+    cluster_H = cluster_hierarchically(active_sites, k)
+    sim = adjusted_rand_index(cluster_P, cluster_H[-1], len(active_sites))
+    print(sim)
+
 

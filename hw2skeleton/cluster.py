@@ -124,7 +124,7 @@ def cluster_by_partitioning(active_sites,k):
         times+=1
     return 
 
-def cluster_hierarchically(active_sites):
+def cluster_hierarchically(active_sites,k):
     """
     Cluster the given set of ActiveSite instances using a hierarchical algorithm.                                                                  #
 
@@ -150,7 +150,7 @@ def cluster_hierarchically(active_sites):
 
     all_clusters.append(output_HC(active_sites, clusters.values()))
     # Group the most similar elements until you only have one more cluster
-    while len(clusters) > 1:
+    while len(clusters) > k:
         # Get most similar clusters
         i,j = np.unravel_index(mat.argmax(), mat.shape)
         # Get two clusters
