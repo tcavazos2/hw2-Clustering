@@ -36,7 +36,7 @@ def test_hierarchical_clustering():
         active_sites.append(io.read_active_site(filepath))
     
     clusters = []
-    for clust in cluster.cluster_hierarchically(active_sites):
+    for clust in cluster.cluster_hierarchically(active_sites,1):
         elems = []
         for e in clust:
             elems.append([int(n.name) for n in e])
