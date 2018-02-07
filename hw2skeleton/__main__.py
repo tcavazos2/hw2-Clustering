@@ -14,7 +14,7 @@ active_sites = read_active_sites(sys.argv[2])
 if sys.argv[1][0:2] == '-P':
     print("Clustering using Partitioning method")
     sil_score_out = open("sil_scores_P.txt", "w")
-    for k in range(2,18):
+    for k in range(2,101):
         print(k)
         clustering = cluster_by_partitioning(active_sites,k)
         write_clustering(sys.argv[3]+"_"+str(k)+".txt", clustering)

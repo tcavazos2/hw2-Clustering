@@ -52,29 +52,13 @@ def create_coord_matrix(site, index):
         mat = np.append(mat, [[x,y,z]], axis=0)
     return mat
 
-def initialize_k_means(data, k):
+def initialize_k_mediods(data, k):
     """
     Randomly select k points and set as cluster centers
     Input: similarity matrix and # of clusters
     Output: centers for clusters
     """
-    centers = set()
-    # Randomly choose first center
-    i = np.random.randint(len(data))
-    centers.add((data[i,0], data[i,1]))
-    while len(centers) < k:
-        # Compute distances of points from the centers
-        D2 = np.array([min([np.linalg.norm(x-c)**2 for c in centers]) for x in data])
-        
-        # Create probability distribution for selecting new center
-        # points that are further away from existing centers are favored
-        probs = D2/D2.sum()
-        cumprobs = probs.cumsum() # calculate cumulative sum
-        r = random.random() # choose random value
-        ind = np.where(cumprobs >= r)[0][0] # get index where probability >= random number
-        centers.add((data[ind,0], data[ind,1])) # add center
-
-    return centers
+    return random.sample(range(len(data)), k) 
 
 def assign_k_clusters(data, centers):
     """
@@ -82,11 +66,22 @@ def assign_k_clusters(data, centers):
     Input: matrix and k centers
     Output: cluster assignments for points in matrix
     """
-    dist_centers = np.empty([len(data),0])
-    for c in centers:
-        arr = np.sqrt(np.sum((data - c)**2, axis=1))
-        dist_centers = np.column_stack((dist_centers, arr))
-    return np.argmin(dist_centers, axis = 1)
+    clusters = []
+    center_data = np.take(data, centers, axis=0)
+    best_center = np.argmax(center_data, axis=0)
+    for i in range(len(centers)):
+        inds = [ind for ind in np.where(best_center == i)[0]]
+        clusters.append(inds)
+    return clusters
+
+def calculate_cost(data, centers, clusters):
+    """
+    Calculate the sum of similarities of cluster elements to centers
+    """
+    total = 0
+    for i in range(len(centers)):
+        total = total + np.sum(data[centers[i]][clusters[i]]) 
+    return total
 
 def recalculate_centers(data, k, clusters):
     """
@@ -109,17 +104,6 @@ def recalculate_centers(data, k, clusters):
             centers.append((result[0], result[0]))
     return centers
 
-def output_cluster_list(clusters, active_sites, k):
-    """
-    Output clusters as list of clusters, that contains a list of active sites
-    """
-    cluster_list = []
-    colors = ['r', 'b', 'g', 'y']
-    for k_i in range(k):
-        inds = [i for i, j in enumerate(clusters) if j == k_i]
-        cluster_list.append([active_sites[a] for a in inds])
-    return cluster_list
-
 def dist_HC(active_sites, clusters,c_new, data):
     """
     Output the distance of the new cluster to all other clusters
@@ -136,7 +120,7 @@ def dist_HC(active_sites, clusters,c_new, data):
             new_arr = np.append(new_arr, d)
     return new_arr
 
-def output_HC(active_sites, clusters):
+def output_cluster_list(active_sites, clusters):
     """
     Output the active site names in list of atoms format
     """

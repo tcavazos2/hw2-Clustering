@@ -98,31 +98,36 @@ def cluster_by_partitioning(active_sites,k):
             (this is really a list of clusters, each of which is list of
             ActiveSite instances)
     """
+    cost_max = float("-inf")
     mat = output_similarity_matrix(active_sites)
-    # Reduce dimensions of similarity matrix to two components in order to define
-    # the centers of clusters
-    # PCA is performed by computing the mean of each column, then getting the covariance
-    # matrix, next sorting the eigenvectors by the largest eigenvalues.
-    # Then you can select the number of components to transform the data onto.
-    # In this case, 2 will be chosen and the points can be clustered in 2D
-    pca = PCA(n_components=2)
-    mat_p = pca.fit(mat).transform(mat)
-    centers = initialize_k_means(mat_p, k)
-    clust_i = np.array([])
-    times = 0
-    while(True):
-        # assign objects to centers
-        clusters = assign_k_clusters(mat_p, centers)
-        if np.array_equal(clust_i, clusters): 
-            return output_cluster_list(clusters, active_sites, k)
-        if times >= len(mat_p): 
-            return output_cluster_list(clusters, active_sites, k)
-        else:
-            clust_i = clusters
-            # calc cluster centers
-            centers = recalculate_centers(mat_p, k, clust_i)
-        times+=1
-    return 
+    
+    # randomly choose k medoids
+    centers = initialize_k_mediods(mat, k)
+    # assign elements to cluster medoid with max similarity
+    clusters = assign_k_clusters(mat, centers)
+    # calculate cost of clustering (sum of similarity of points to cluster)
+    cost = calculate_cost(mat, centers, clusters)
+    # iterate until cost does not increase
+    while cost_max < cost:
+        cost_max = cost
+        # Loop through medoids and all elements not in medoids
+        for i in range(0, len(centers)):
+            m = centers[i]
+            for o in range(len(active_sites)):
+                if o != m:
+                    # replace medoid with element and re-calculate clusters
+                    # and cost
+                    centers[i] = o
+                    clusters_temp = assign_k_clusters(mat, centers)
+                    cost_swap = calculate_cost(mat, centers, clusters_temp)
+                    # if cost increases then replace clusters
+                    if cost_swap > cost: 
+                        cost = cost_swap
+                        clusters = clusters_temp
+                    # if cost decreases or stays the same leave center
+                    else: centers[i] = m
+    print(clusters)
+    return output_cluster_list(active_sites, clusters)
 
 def cluster_hierarchically(active_sites,k):
     """
@@ -144,11 +149,7 @@ def cluster_hierarchically(active_sites,k):
     clusters = dict(zip(keys, vals))
     all_clusters = []
 
-    # Construct graph with n isolated nodes
-    #G = nx.DiGraph()
-    #G.add_nodes_from(np.arange(0, len(active_sites)))
-
-    all_clusters.append(output_HC(active_sites, clusters.values()))
+    all_clusters.append(output_cluster_list(active_sites, clusters.values()))
     # Group the most similar elements until you only have one more cluster
     while len(clusters) > k:
         # Get most similar clusters
@@ -159,9 +160,6 @@ def cluster_hierarchically(active_sites,k):
         # Add new combined cluster
         c_new = list(clusters.keys())[-1]+1
         clusters[c_new] = np.append(c_i, c_j)
-        
-        #G.add_node(c_new)
-        #G.add_edges_from([(c_new,i),(c_new, j)])
         
         # Add new row/column to similarity matrix
         new_dist = dist_HC(active_sites, clusters,c_new, mat_original)
@@ -175,5 +173,5 @@ def cluster_hierarchically(active_sites,k):
         # Drop most similar elements from cluster
         clusters.pop(i)
         clusters.pop(j)
-        all_clusters.append(output_HC(active_sites, clusters.values()))
+        all_clusters.append(output_cluster_list(active_sites, clusters.values()))
     return all_clusters

@@ -23,7 +23,6 @@ def test_partition_clustering():
         active_sites.append(io.read_active_site(filepath))
 
     clusters = cluster.cluster_by_partitioning(active_sites,1)[0]
-    
     assert [int(c.name) for c in clusters] == [276, 4629, 10701]
 
 def test_hierarchical_clustering():
