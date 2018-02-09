@@ -126,7 +126,6 @@ def cluster_by_partitioning(active_sites,k):
                         clusters = clusters_temp
                     # if cost decreases or stays the same leave center
                     else: centers[i] = m
-    print(clusters)
     return output_cluster_list(active_sites, clusters)
 
 def cluster_hierarchically(active_sites,k):
