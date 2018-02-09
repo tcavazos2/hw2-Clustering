@@ -107,7 +107,7 @@ def recalculate_centers(data, k, clusters):
 def dist_HC(active_sites, clusters,c_new, data):
     """
     Output the distance of the new cluster to all other clusters
-    by computing the average distance 
+    by computing the average similarity 
     """
     new_arr = np.array([])
     for i in range(c_new):
