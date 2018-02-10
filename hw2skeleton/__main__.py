@@ -36,7 +36,7 @@ if sys.argv[1][0:2] == '-H':
     sil_score_out.close()
 
 if sys.argv[1][0:8] == '-compare':
-    k = 17
+    k = 50
     print("Calculating similarity between clusters with k = ", k)
     print("Clustering using partitioning method")
     cluster_P = cluster_by_partitioning(active_sites, k)
