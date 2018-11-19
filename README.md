@@ -1,4 +1,4 @@
-# HW2 Skeleton 
+# UCSF BMI203 HW #2 Clustering 
 
 [![Build
 Status](https://travis-ci.org/tcavazos2/hw2-skeleton.svg?branch=master)](https://travis-ci.org/tcavazos2/hw2-skeleton)
