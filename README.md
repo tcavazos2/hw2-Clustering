@@ -1,7 +1,7 @@
 # UCSF BMI203 HW #2 Clustering 
 
 [![Build
-Status](https://travis-ci.org/tcavazos2/hw2-skeleton.svg?branch=master)](https://travis-ci.org/tcavazos2/hw2-skeleton)
+Status](https://travis-ci.org/tcavazos2/hw2-Clustering.svg?branch=master)](https://travis-ci.org/tcavazos2/hw2-Clustering)
 
 Skeleton for clustering project.
 
